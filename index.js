@@ -23,11 +23,6 @@ app.get('/urlsData', async(req,res)=>{
   }]).toArray();
   res.send(urlsData);
 })
-app.get("/data", async (request, response) => {
-  const client = await createConnection();
-  const user = await client.db("urlshortener").collection("passwords").find().toArray();
-    response.send(user);
-})
 app.post('/shortUrl', async (req,res)=>{
   const {fullUrl} = req.body;
   const short = shortId.generate();
