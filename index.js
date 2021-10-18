@@ -10,10 +10,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT;
-// const MONGO_URL = process.env.MONGO_URL;
-const MONGO_URL = "mongodb://localhost";
+const MONGO_URL = process.env.MONGO_URL;
 import shortId from "shortid";
 app.use(express.urlencoded({extended:false}))
+async function createConnection() {
+  const client = new MongoClient(MONGO_URL);
+  await client.connect();
+  return client;
+}
 app.get('/urlsData', async(req,res)=>{
   const client = await createConnection();
   const urlsData = await client.db("urlshortener").collection("urls").aggregate([{
@@ -32,11 +36,6 @@ app.post('/shortUrl', async (req,res)=>{
     full:fullUrl, short:short,clicks:0, createdAt : date});
   res.send({short:short});
 })
-async function createConnection() {
-  const client = new MongoClient(MONGO_URL);
-  await client.connect();
-  return client;
-}
 app.post("/data", async (request, response) => {
   const { email } = request.body;
   const client = await createConnection();
@@ -241,7 +240,7 @@ app.put("/activateAccount/:email/:token", async (request, response) => {
 app.post("/users/SignUp", async (request, response) => {
   const { email, password, firstName, lastName } = request.body;
   const token = jwt.sign({ email: email }, process.env.MY_SECRET_KEY);
-  const url = `http://localhost:3000/activateAccount/${email}/${token}`;
+  const url = `https://urlshortener-frontend-ranjith.netlify.app/activateAccount/${email}/${token}`;
   const client = await createConnection();
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -265,7 +264,6 @@ app.post("/users/SignUp", async (request, response) => {
     subject: 'Account activation link',
     html:
       `<a href =  "${url}">Click this link to activate the account </a>`
-    // '<a href = "https://password-reset-ranjith.netlify.app/retrieveAccount/' + email + '/' + token + '"> Reset Password Link</a>'
   };
   transporter.sendMail(mailOptions, async function (err, data) {
     if (err) {
