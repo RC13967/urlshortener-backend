@@ -153,8 +153,7 @@ app.post("/users/forgot", async (request, response) => {
       to: email,
       subject: 'Reset Password link',
       html:
-        '<a href = "http://localhost:3000/retrieveAccount/' + email + '/' + token + '"> Reset Password Link</a>'
-      // '<a href = "https://password-reset-ranjith.netlify.app/retrieveAccount/' + email + '/' + token + '"> Reset Password Link</a>'
+      '<a href = "https://password-reset-ranjith.netlify.app/retrieveAccount/' + email + '/' + token + '"> Reset Password Link</a>'
     };
     transporter.sendMail(mailOptions, async function (err, data) {
       if (err) {
